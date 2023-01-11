@@ -1,4 +1,4 @@
-package com.donguk.board.dto;
+package com.donguk.board.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
-
+public class PatchUserDTO {
 	private String email;
 	private String nickname;
 	private String profile;
-	private String telphone;
-	private String address;
 }

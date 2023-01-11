@@ -5,8 +5,9 @@ import org.springframework.stereotype.Service;
 
 import com.donguk.board.dto.response.ResponseDTO;
 import com.donguk.board.dto.user.GetUserResponseDTO;
+import com.donguk.board.dto.user.PatchUserDTO;
 import com.donguk.board.dto.user.PostUserDTO;
-import com.donguk.board.dto.user.PostUserResponseDTO;
+import com.donguk.board.dto.user.ResultResponseDTO;
 import com.donguk.board.entity.MemberEntity;
 import com.donguk.board.repository.MemberRepository;
 
@@ -62,7 +63,7 @@ public class UserService {
 		return ResponseDTO.setSuccess("Get User Success", new GetUserResponseDTO(member));
 	}
 	
-	public ResponseDTO<PostUserResponseDTO> postUser(PostUserDTO dto) {
+	public ResponseDTO<ResultResponseDTO> postUser(PostUserDTO dto) {
 
 		// 데이터베이스에 해당 이메일이 존재하는지 체크
 		// * 존재한다면 Failed Response를 반환
@@ -99,7 +100,40 @@ public class UserService {
 		// Entity Insert 작업을 수행
 		// * 해당 Entity Id가 데이터테이블에 존재하면 존재하는 Entity를 UPDATE작업을 수행
 		
-		return ResponseDTO.setSuccess("회원가입에 성공했습니다.", new PostUserResponseDTO(true));
+		return ResponseDTO.setSuccess("회원가입에 성공했습니다.", new ResultResponseDTO(true));
+	}
+
+	public ResponseDTO<GetUserResponseDTO> patchUser(PatchUserDTO dto) {
+		// dto에서 이메일을 가져온다
+		
+		String email = dto.getEmail();
+		MemberEntity member = null;
+		
+		// repository를 이용해서 데이터베이스에 있는 member테이블 중
+		// email에 해당하는 데이터를 불러온다.
+		try {
+			member = memberRepository.findById(email).get();
+		}catch(Exception e){
+			// 만약 존재하지 않으면 Failed Response로 "Not Exist User" 반환
+			return ResponseDTO.setFailed("Not Exist User");
+		}
+		
+		// Request Body로 받은 nickname과 profile로 각각 변경
+		member.setNickname(dto.getNickname());
+		member.setProfile(dto.getProfile());
+		
+		// 변경한 Entity를 Repository를 이용해서 데이터베이스에 적용(저장)
+		memberRepository.save(member);
+		
+		// 결과를 ResponseDTO에 담아서 반환
+		return ResponseDTO.setSuccess("user patch success", new GetUserResponseDTO(member));
+	}
+
+	public ResponseDTO<ResultResponseDTO> deleteUser(String email) {
+		// Repository를 이용해서 데이터베이스의 Member테이블 중 email에 해당하는 데이터를 삭제
+		memberRepository.deleteById(email);
+		
+		return ResponseDTO.setSuccess("삭제가 완료됬습니다.", new ResultResponseDTO(true));
 	}
 
 }
