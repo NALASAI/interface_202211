@@ -1,5 +1,8 @@
 package com.donguk.board.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,18 @@ import com.donguk.board.repository.MemberRepository;
 public class UserService {
 
 	@Autowired MemberRepository memberRepository;
+	
+	public ResponseDTO<List<GetUserResponseDTO>> getAllUser(){
+		List<MemberEntity> memberList = memberRepository.findAll();
+		
+		List<GetUserResponseDTO> data = new ArrayList<GetUserResponseDTO>();
+		
+		for(MemberEntity member: memberList) {
+			data.add(new GetUserResponseDTO(member));
+		}
+		
+		return ResponseDTO.setSuccess("get User List Success", data);
+	}
 	
 	public ResponseDTO<GetUserResponseDTO> getUser(String email){
 		// 해당 이메일을 데이터베이스에서 검색
